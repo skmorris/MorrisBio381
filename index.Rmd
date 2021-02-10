@@ -8,6 +8,8 @@ output:
     highlight: github
 ---
 
+<img src="IMG_3681.jpg" width="300" height="217" />
+
 #### Homework Assignments
 
 #### Week 1: **Nothing due**
