@@ -7,3 +7,10 @@ output:
     theme: cayman
     highlight: github
 ---
+
+#### Homework Assignments
+
+#### Week 1: **Nothing due**
+
+#### Week 2: [Homework 2](Homework_02.html)
+
