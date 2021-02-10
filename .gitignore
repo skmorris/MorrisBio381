@@ -1,0 +1,6 @@
+#these are the files that aren't being tracked
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.pdf
