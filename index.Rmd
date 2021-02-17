@@ -14,5 +14,7 @@ output:
 
 #### Week 1: **Nothing due**
 
-#### Week 2: [Homework 2](Homework_02.html)
+#### Week 2: **Nothing due**
+
+#### Week 3: [Homework 3](Homework3.html)
 

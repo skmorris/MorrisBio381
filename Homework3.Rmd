@@ -1,0 +1,19 @@
+---
+title: "Homework 3"
+author: "Sarah Morris"
+date: "2/17/2021"
+output: html_document
+---
+#### Question 1    
+transforming some lines into a .csv readable format  
+I took this input file:  
+```  
+First String    Second      1.22      3.4
+Second          More Text   1.555555  2.2220
+Third           x           3         124
+```
+```
+find: $s\s+
+replace: , 
+```
+
