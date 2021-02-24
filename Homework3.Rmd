@@ -2,19 +2,99 @@
 title: "Homework 3"
 author: "Sarah Morris"
 date: "2/17/2021"
-output: html_document
+output: 
+  html_document: 
+    theme: cerulean
 ---
+___
+
+
 #### Question 1    
-transforming some lines into a .csv readable format  
-I took this input file:  
-```  
-First String    Second      1.22      3.4
-Second          More Text   1.555555  2.2220
-Third           x           3         124
+###### transforming some lines into a .csv readable format  
+
+
+I used this `\s{2,}` expression to find at least 2 spaces,  
+and I replaced it with a comma.
+
+
 ```
-```
-find: $s\s+
+find: \s{2,}
 replace: , 
 ```
+___
+#### Question 2   
+###### transforming some lines into proper format for NSF  
+
+I used this `(\w+), \s*(\w+),\s*(.*)` expression to capture the  
+first and last names and institutions, and then my replace expression  
+puts them in the proper format.
 
 
+```
+find: (\w+), \s*(\w+),\s*(.*)
+replace: \2 \1 \(\3\)
+```
+___
+#### Question 3   
+###### putting mp3 files in their own lines 
+
+I used this `(\.\w\w\d\s)` expression to capture the  
+.mp3 and the space after, and I replaced it with the capture  
+plus a line break.
+
+
+```
+find: (\.\w\w\d\s)
+replace: \1\n
+```
+___
+#### Question 4   
+###### moving numbers to the end of the mp3 file name 
+
+I used this `(\d+) (.+)\.(\w+)` expression to capture the  
+numbers, the text before the period, and the file extension.  
+I rearranged what I had captured and added an underscore and a period.   
+
+```
+find: (\d+) (.+)\.(\w+)
+replace: \2_\1.\3
+```
+___
+#### Question 5   
+###### shortening Genus names
+
+I used this `(\w)\w+,(\w+),\d+.\d,(\d+)` expression to capture the  
+first letter of the Genus name, the species name and the second number.  
+In my replacement, I rearranged what I had captured and added in an underscore   
+and a comma.  
+
+```
+find: (\w)\w+,(\w+),\d+.\d,(\d+)
+replace: \1_\2,\3
+```
+___
+#### Question 6   
+###### abbreviating Genus and species names 
+
+I used this `(\w)\w+,([A-Z][A-Z][A-Z][A-Z])\w+,.+,(\d+)` expression to capture   
+the first letter of the Genus name, the first 4 letters of the species name and   
+the second number. In my replacement, I rearranged what I had captured and added   
+in an underscore and a comma. 
+
+```
+find: (\w)\w+,([A-Z][A-Z][A-Z][A-Z])\w+,.+,(\d+)
+replace: \1_\2,\3
+```
+___
+#### Question 7   
+###### merging Genus and species names 
+
+I used this `(\w{3})\w+,(\w{3})\w+,(\d+\.\d),(\d+)` expression to capture   
+the first three letters of the Genus and species names and both numbers.  
+In my replacement, I rearranged the number captures and added in commas and spaces.  
+
+```
+find: (\w{3})\w+,(\w{3})\w+,(\d+\.\d),(\d+)
+replace: \1\2, \4, \3
+```
+___
