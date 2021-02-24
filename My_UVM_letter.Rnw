@@ -1,0 +1,66 @@
+\documentclass[10pt]{article} % change font size here
+
+%--------------------------------------
+\usepackage{hyphenat} % use to disable hyphenation
+\usepackage[margin=1.0in,top=.5in]{geometry} % adjust margins
+\usepackage{lipsum} % Just for this example
+
+%--------------------------------------
+% \renewcommand{\familydefault}{\ttdefault} % use for plain text
+\setlength{\parindent}{0pt} % No paragraph indent
+\pagestyle{empty} % No page headers/footers
+\setlength{\parskip}{5mm plus 4mm minus 3mm} % for paragraph spacing
+%--------------------------------------
+\begin{document}
+\raggedright % toggle off for flush right margin
+\includegraphics[scale=.1]{UVMLogo.jpg}\\ % delete to remove UVM letterhead
+%--------------------------------------
+ \hfill\hfill\hfill % to align following text flush right
+24 February 2021\\[10pt]  % <-- ADD DATE HERE
+%--------------------------------------
+\begin{tabular}{@{}l}
+Sarah K. Morris \\ 
+27 Colchester Avenue \\
+Burlington, Vermont 05405 \\
+Phone: +1(727) 510-0451 \\
+Email: skmorris@uvm.edu
+\end{tabular}
+
+%--------------------------------------
+\begin{tabular}{@{}l}
+  % date time stamp % use these entries for left flush
+  % \bigskip
+Recipient Name\\
+Address 1\\
+Address 2\\
+Address 3
+\end{tabular}
+%--------------------------------------
+%--------------------------------------
+
+
+Dear X:
+
+\lipsum[1-2]
+
+
+
+% \newpage % use if necessary to adjust spacing for signature block
+
+%--------------------------------------
+%--------------------------------------
+
+\begin{tabular}{@{}l}
+Cheers,\\
+\includegraphics[scale=0.1,width=1.25in]{signature.jpg}\\
+Sarah K. Morris\\
+Graduate Student, Department of Plant Biology\\
+University of Vermont\\
+Burlington, VT 05405 USA\\
++1(727)510-0451\\
+skmorris@uvm.edu\\
+\end{tabular}
+%--------------------------------------
+
+\end{document}
+
