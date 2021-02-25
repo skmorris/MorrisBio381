@@ -20,6 +20,7 @@
 %--------------------------------------
 \begin{tabular}{@{}l}
 Sarah K. Morris \\ 
+Pringle Herbarium\\
 27 Colchester Avenue \\
 Burlington, Vermont 05405 \\
 Phone: +1(727) 510-0451 \\
@@ -54,11 +55,9 @@ Dear X:
 Cheers,\\
 \includegraphics[scale=0.1,width=1.25in]{signature.jpg}\\
 Sarah K. Morris\\
-Graduate Student, Department of Plant Biology\\
+Graduate Student\\
+Department of Plant Biology\\
 University of Vermont\\
-Burlington, VT 05405 USA\\
-+1(727)510-0451\\
-skmorris@uvm.edu\\
 \end{tabular}
 %--------------------------------------
 

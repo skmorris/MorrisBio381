@@ -7,4 +7,6 @@ html_document:
     theme: cerulean
 ---
 
+put typora html here
 ![Letter Template](My_UVM_letter.pdf)
+![My slides](My_slides.pdf)
