@@ -7,7 +7,7 @@ html_document:
     theme: cerulean
 ---
 
-[typora](typora_4.html)  
+[Typora](typora_4.html)  
 
 [Letter Template](My_UVM_letter.pdf)  
 
