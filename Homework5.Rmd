@@ -1,0 +1,45 @@
+---
+title: 'Homework #5'
+author: "Sarah Morris"
+date: "3/3/2021"
+output: html_document
+---
+
+#### Question 1
+```{r, echo = TRUE}
+#setting the input variables
+x <- 1.1
+a <- 2.2
+b <- 3.3
+
+#1a
+z <- x^(a^b)
+print(z)
+
+#1b
+z <- (x^a)^b
+print(z)
+
+#1c
+z <- (3*(x^3))+(2*(x^2))+1
+print(z)
+```
+
+#### Question 2
+```{r, echo = TRUE}
+#2a
+vec_a <- c(seq(1,8), seq(7,1))
+print(vec_a)
+
+#2b
+list_b <- 1:5
+vec_b <- rep(x=list_b, times=list_b)
+print(vec_b)
+
+#2c
+#using list_b vector I made in last part
+list_c <- 5:1
+vec_c <- rep(x=list_c, times=list_b)
+print(vec_c)
+```
+
