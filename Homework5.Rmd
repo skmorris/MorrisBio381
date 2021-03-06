@@ -2,10 +2,14 @@
 title: 'Homework #5'
 author: "Sarah Morris"
 date: "3/3/2021"
-output: html_document
+output:
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
 ---
+- - -
 
-#### Question 1
+### Question 1
 ```{r, echo = TRUE}
 #setting the input variables
 x <- 1.1
@@ -25,7 +29,9 @@ z <- (3*(x^3))+(2*(x^2))+1
 print(z)
 ```
 
-#### Question 2
+- - - 
+
+### Question 2
 ```{r, echo = TRUE}
 #2a
 vec_a <- c(seq(1,8), seq(7,1))
@@ -43,7 +49,9 @@ vec_c <- rep(x=list_c, times=list_b)
 print(vec_c)
 ```
 
-#### Question 3
+- - -
+
+### Question 3
 ```{r, echo=TRUE}
 rand <- runif(2)
 
@@ -65,7 +73,9 @@ print(polar)
 
 ```
 
-#### Question 4
+- - -
+
+### Question 4
 ```{r, echo=TRUE}
 #setup the queue
 queue <- c("sheep", "fox", "owl", "ant")
@@ -102,7 +112,9 @@ which(queue == "aphid")
 
 ```
 
-#### Question 5
+- - -
+
+### Question 5
 ```{r, echo=TRUE}
 #create a vector from 1 to 100 that isn't divisible by 2, 3 or 7
 my_vec <- 1:100
