@@ -233,6 +233,88 @@ vec_c &lt;- rep(x=list_c, times=list_b)
 print(vec_c)</code></pre>
 <pre><code>##  [1] 5 4 4 3 3 3 2 2 2 2 1 1 1 1 1</code></pre>
 </div>
+<div id="question-3" class="section level4">
+<h4>Question 3</h4>
+<pre class="r"><code>rand &lt;- runif(2)
+
+#calculate the radius using Pythagorean theorem 
+r &lt;- ((rand[1]^2) + (rand[2]^2))^0.5
+
+#calculate the inverse tangent, 
+in_tan &lt;- atan(rand[2]/rand[1])
+
+#calculate theta from above input &amp;
+#multiply by 180 divided by pi to convert from radians to degrees
+theta &lt;- in_tan * (180/pi)
+
+#bind into single vector of polar coordinates
+polar &lt;- c(r,theta)
+
+#print the polar coordinates vector (vector length, angle)
+print(polar)</code></pre>
+<pre><code>## [1]  1.291604 48.589664</code></pre>
+</div>
+<div id="question-4" class="section level4">
+<h4>Question 4</h4>
+<pre class="r"><code>#setup the queue
+queue &lt;- c(&quot;sheep&quot;, &quot;fox&quot;, &quot;owl&quot;, &quot;ant&quot;)
+print(queue)</code></pre>
+<pre><code>## [1] &quot;sheep&quot; &quot;fox&quot;   &quot;owl&quot;   &quot;ant&quot;</code></pre>
+<pre class="r"><code>#4a
+queue &lt;- c(queue, &quot;serpent&quot;)
+print(queue)</code></pre>
+<pre><code>## [1] &quot;sheep&quot;   &quot;fox&quot;     &quot;owl&quot;     &quot;ant&quot;     &quot;serpent&quot;</code></pre>
+<pre class="r"><code>#4b
+queue = queue[-1]
+print(queue)</code></pre>
+<pre><code>## [1] &quot;fox&quot;     &quot;owl&quot;     &quot;ant&quot;     &quot;serpent&quot;</code></pre>
+<pre class="r"><code>#4c
+queue = c(&quot;donkey&quot;,queue)
+print(queue)</code></pre>
+<pre><code>## [1] &quot;donkey&quot;  &quot;fox&quot;     &quot;owl&quot;     &quot;ant&quot;     &quot;serpent&quot;</code></pre>
+<pre class="r"><code>#4d
+queue = queue[-5]
+print(queue)</code></pre>
+<pre><code>## [1] &quot;donkey&quot; &quot;fox&quot;    &quot;owl&quot;    &quot;ant&quot;</code></pre>
+<pre class="r"><code>#4e
+queue = queue[-3]
+print(queue)</code></pre>
+<pre><code>## [1] &quot;donkey&quot; &quot;fox&quot;    &quot;ant&quot;</code></pre>
+<pre class="r"><code>#4f
+queue[3] = &quot;aphid&quot;
+queue = c(queue, &quot;ant&quot;)
+print(queue)</code></pre>
+<pre><code>## [1] &quot;donkey&quot; &quot;fox&quot;    &quot;aphid&quot;  &quot;ant&quot;</code></pre>
+<pre class="r"><code>#4g
+#the aphid is third in line
+which(queue == &quot;aphid&quot;)</code></pre>
+<pre><code>## [1] 3</code></pre>
+</div>
+<div id="question-5" class="section level4">
+<h4>Question 5</h4>
+<pre class="r"><code>#create a vector from 1 to 100 that isn&#39;t divisible by 2, 3 or 7
+my_vec &lt;- 1:100
+
+my_vec_wo = my_vec[-(which(my_vec%%7 == 0 | my_vec%%2 == 0 | my_vec%%3 == 0))]
+
+#print
+print(my_vec_wo)</code></pre>
+<pre><code>##  [1]  1  5 11 13 17 19 23 25 29 31 37 41 43 47 53 55 59 61 65 67 71 73 79 83 85
+## [26] 89 95 97</code></pre>
+<pre class="r"><code>#double checking
+my_vec_wo%%2 == 0</code></pre>
+<pre><code>##  [1] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [13] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [25] FALSE FALSE FALSE FALSE</code></pre>
+<pre class="r"><code>my_vec_wo%%3 == 0</code></pre>
+<pre><code>##  [1] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [13] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [25] FALSE FALSE FALSE FALSE</code></pre>
+<pre class="r"><code>my_vec_wo%%7 == 0</code></pre>
+<pre><code>##  [1] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [13] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [25] FALSE FALSE FALSE FALSE</code></pre>
+</div>
 
 
 

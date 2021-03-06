@@ -43,3 +43,77 @@ vec_c <- rep(x=list_c, times=list_b)
 print(vec_c)
 ```
 
+#### Question 3
+```{r, echo=TRUE}
+rand <- runif(2)
+
+#calculate the radius using Pythagorean theorem 
+r <- ((rand[1]^2) + (rand[2]^2))^0.5
+
+#calculate the inverse tangent, 
+in_tan <- atan(rand[2]/rand[1])
+
+#calculate theta from above input &
+#multiply by 180 divided by pi to convert from radians to degrees
+theta <- in_tan * (180/pi)
+
+#bind into single vector of polar coordinates
+polar <- c(r,theta)
+
+#print the polar coordinates vector (vector length, angle)
+print(polar)
+
+```
+
+#### Question 4
+```{r, echo=TRUE}
+#setup the queue
+queue <- c("sheep", "fox", "owl", "ant")
+print(queue)
+
+#4a
+queue <- c(queue, "serpent")
+print(queue)
+
+#4b
+queue = queue[-1]
+print(queue)
+
+#4c
+queue = c("donkey",queue)
+print(queue)
+
+#4d
+queue = queue[-5]
+print(queue)
+
+#4e
+queue = queue[-3]
+print(queue)
+
+#4f
+queue[3] = "aphid"
+queue = c(queue, "ant")
+print(queue)
+
+#4g
+#the aphid is third in line
+which(queue == "aphid")
+
+```
+
+#### Question 5
+```{r, echo=TRUE}
+#create a vector from 1 to 100 that isn't divisible by 2, 3 or 7
+my_vec <- 1:100
+
+my_vec_wo = my_vec[-(which(my_vec%%7 == 0 | my_vec%%2 == 0 | my_vec%%3 == 0))]
+
+#print
+print(my_vec_wo)
+
+#double checking
+my_vec_wo%%2 == 0
+my_vec_wo%%3 == 0
+my_vec_wo%%7 == 0
+```
