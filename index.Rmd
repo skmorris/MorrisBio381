@@ -21,3 +21,5 @@ output:
 #### Week 4: [Homework 4](Homework4.html)
 
 #### Week 5: [Homework 5](Homework5.html)
+
+#### Week 6: [Homework 6](Homework_6.html)
