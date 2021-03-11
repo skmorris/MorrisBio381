@@ -42,7 +42,39 @@ typeof(eigen(m)$vectors)
 #### Question 2
 
 ```{r, echo=TRUE}
+my_list <- list(my_matrix <- matrix(data = runif(16),nrow = 4), my_logical <- 
+                  (runif(100) > 0.5), my_letters <- sample(letters, 26))
 
+print(my_list)
 
+my_list_sub <- list(my_list[[1]][2,2], my_list[[2]][2], c <- my_list[[3]][2])
+
+typeof(my_list_sub[[1]])#double
+typeof(my_list_sub[[2]])#logical
+typeof(my_list_sub[[3]])#character
+
+new_vec <- c(my_list_sub[[1]], my_list_sub[[2]], my_list_sub[[3]])
+  
+typeof(new_vec)  
+#its character data
+```
+
+#### Question 3
+
+```{r, echo=TRUE}
+
+my_unis <- runif(26, min = 0, max = 10)
+
+my_letters <- sample(LETTERS,26)
+
+df <- data.frame(my_unis, my_letters, stringsAsFactors = FALSE)
+
+df[sample(1:26,4),1] = NA
+
+which(is.na(df[,1]) == TRUE)
+
+df[,2] = sort(df[,2])
+
+mean(df[,1], na.rm = T)
 
 ```
