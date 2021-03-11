@@ -12,7 +12,36 @@ output:
 
 ```{r, echo=TRUE}
 
+n_dims <- as.integer(runif(n=1, min=3, max=10)) 
 
+my_vec <- seq(from = 1, to = n_dims^2)
+
+my_vec <- sample(x=my_vec)
+
+m <- matrix(data = my_vec, nrow = n_dims)
+
+print(m)
+
+m_transpose <- t(m)
+
+print(m_transpose)
+
+sum(m[1,])
+sum(m[n_dims,])
+mean(m[1,])
+mean(m[n_dims,])
+
+eigen(m)
+
+#the structure of both eigen values and eigen vectors is complex numbers
+typeof(eigen(m)$values)
+typeof(eigen(m)$vectors)
+#the typeof() command confirms this
+```
+
+#### Question 2
+
+```{r, echo=TRUE}
 
 
 

@@ -1,7 +1,7 @@
 ---
 title: "Sarah Morris - Bio 381"
 author: "Sarah Morris"
-date: "February 2021"
+date: "Spring 2021"
 output: 
   prettydoc::html_pretty:
     theme: cayman
