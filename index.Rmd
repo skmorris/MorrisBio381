@@ -22,4 +22,18 @@ output:
 
 #### Week 5: [Homework 5](Homework5.html)
 
-#### Week 6: [Homework 6](Homework_6.html)
+#### Week 6: [Homework 6](Homework_6.html)  
+
+#### Week 7: [Homework 7](Homework_7.html)
+
+#### Week 8: **Nothing due**
+
+#### Week 9: [Homework 8]
+
+#### Week 10: [Homework 9]
+
+#### Week 11: [Homework 10]
+
+#### Week 12: [Homework 11]
+
+#### Week 13: [Homework 12]
