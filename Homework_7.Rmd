@@ -10,17 +10,16 @@ output:
 
 #### Part 1: Fake Data
 
-
-
-
-
- ---
-#### Part 2: Actual Data
-
 ```{r, echo=TRUE}
+
 library(ggplot2) # for graphics
 library(MASS) # for maximum likelihood estimation
 
+```
+
+
+##### Generate fake data
+```{r, echo=TRUE}
 # quick and dirty, a truncated normal distribution to work on the solution set
 
 z <- rnorm(n=3000,mean=0.2)
@@ -29,15 +28,117 @@ names(z) <- list("ID","myVar")
 z <- z[z$myVar>0,]
 str(z)
 summary(z$myVar)
+```
 
+##### plot histogram
+```{r, echo=TRUE}
+# ..density.. --> shorthand for ggplot to plot the density
 p1 <- ggplot(data=z, aes(x=myVar, y=..density..)) +
+  geom_histogram(color="grey60",fill="cornsilk",size=0.2) 
+print(p1)
+
+```
+
+##### add empirical density curve
+```{r, echo=TRUE}
+p1 <-  p1 +  geom_density(linetype="dotted",size=0.75)
+print(p1)
+```
+
+##### get maximum likelihood parameters for normal distribution
+```{r, echo=TRUE}
+normPars <- fitdistr(z$myVar,"normal")
+print(normPars)
+str(normPars)
+normPars$estimate["mean"] # note structure of getting a named attribute
+```
+
+##### plot normal probability density 
+###### call the dnorm function inside ggplot’s stat_function to generate the probability density for the normal distribution
+###### we first get the maximum likelihood parameters for a normal distribution fitted to thse data by calling fitdistr. Then we pass those parameters (meanML and sdML to stat_function
+```{r, echo=TRUE}
+meanML <- normPars$estimate["mean"]
+sdML <- normPars$estimate["sd"]
+
+xval <- seq(0,max(z$myVar),len=length(z$myVar))
+
+ stat <- stat_function(aes(x = xval, y = ..y..), fun = dnorm, colour="red", n = length(z$myVar), args = list(mean = meanML, sd = sdML)) #red line = probability density
+ p1 + stat
+ 
+# the best-fitting normal distribution (red curve) for these data actually has a biased mean. That is because the data set has no negative values, so the normal distribution (which is symmetric) is not working well
+```
+
+##### plot exponential probability density
+```{r, echo=TRUE}
+expoPars <- fitdistr(z$myVar,"exponential")
+rateML <- expoPars$estimate["rate"]
+
+stat2 <- stat_function(aes(x = xval, y = ..y..), fun = dexp, colour="blue", n = length(z$myVar), args = list(rate=rateML))
+ p1 + stat + stat2
+```
+
+##### plot uniform probability density
+```{r, echo=TRUE}
+# For the uniform, we don’t need to use fitdistr because the maximum likelihood estimators of the two parameters are just the minimum and the maximum of the data
+stat3 <- stat_function(aes(x = xval, y = ..y..), fun = dunif, colour="darkgreen", n = length(z$myVar), args = list(min=min(z$myVar), max=max(z$myVar)))
+ p1 + stat + stat2 + stat3
+```
+
+##### plot gamma probability density 
+```{r, echo=TRUE}
+gammaPars <- fitdistr(z$myVar,"gamma")
+shapeML <- gammaPars$estimate["shape"]
+rateML <- gammaPars$estimate["rate"]
+
+stat4 <- stat_function(aes(x = xval, y = ..y..), fun = dgamma, colour="purple", n = length(z$myVar), args = list(shape=shapeML, rate=rateML))
+ p1 + stat + stat2 + stat3 + stat4
+```
+
+##### plot beta probability density
+```{r, echo=TRUE}
+
+#This one has to be shown in its own plot because the raw data must be rescaled so they are between 0 and 1, and then they can be compared to the beta
+
+pSpecial <- ggplot(data=z, aes(x=myVar/(max(myVar + 0.1)), y=..density..)) +
+  geom_histogram(color="grey60",fill="cornsilk",size=0.2) + 
+  xlim(c(0,1)) +
+  geom_density(size=0.75,linetype="dotted")
+
+betaPars <- fitdistr(x=z$myVar/max(z$myVar + 0.1),start=list(shape1=1,shape2=2),
+                     "beta")
+shape1ML <- betaPars$estimate["shape1"]
+shape2ML <- betaPars$estimate["shape2"]
+
+statSpecial <- stat_function(aes(x = xval, y = ..y..), fun = dbeta, 
+                             colour="orchid", n = length(z$myVar), args = list(shape1=shape1ML,shape2=shape2ML))
+pSpecial + statSpecial
+```
+ 
+
+#### Part 2: Actual Data
+
+
+```{r, echo=TRUE}
+bacteria <- read.csv("Tuesday_ZOI.csv")
+as.data.frame(bacteria)
+str(bacteria)
+summary(bacteria)
+
+#z <- rnorm(n=3000,mean=0.2)
+#z <- data.frame(1:3000,z)
+#names(z) <- list("ID","myVar")
+#z <- z[z$myVar>0,]
+#str(z)
+#summary(z$myVar)
+
+p1 <- ggplot(data=bacteria, aes(x=bacteria$width, y=..density..)) +
   geom_histogram(color="grey60",fill="cornsilk",size=0.2) 
 print(p1)
 
 p1 <-  p1 +  geom_density(linetype="dotted",size=0.75)
 print(p1)
 
-normPars <- fitdistr(z$myVar,"normal")
+normPars <- fitdistr(bacteria$width,"normal")
 print(normPars)
 str(normPars)
 normPars$estimate["mean"] # note structure of getting a named attribute
@@ -45,37 +146,94 @@ normPars$estimate["mean"] # note structure of getting a named attribute
 meanML <- normPars$estimate["mean"]
 sdML <- normPars$estimate["sd"]
 
-xval <- seq(0,max(z$myVar),len=length(z$myVar))
+xval <- seq(0,max(bacteria$width),len=length(bacteria$width))
 
-stat <- stat_function(aes(x = xval, y = ..y..), fun = dnorm, colour="red", n = length(z$myVar), args = list(mean = meanML, sd = sdML))
+stat <- stat_function(aes(x = xval, y = ..y..), fun = dnorm, colour="red", n = length(bacteria$width), args = list(mean = meanML, sd = sdML))
  p1 + stat
  
-expoPars <- fitdistr(z$myVar,"exponential")
+expoPars <- fitdistr(bacteria$width,"exponential")
 rateML <- expoPars$estimate["rate"]
 
-stat2 <- stat_function(aes(x = xval, y = ..y..), fun = dexp, colour="blue", n = length(z$myVar), args = list(rate=rateML))
+stat2 <- stat_function(aes(x = xval, y = ..y..), fun = dexp, colour="blue", n = length(bacteria$width), args = list(rate=rateML))
  p1 + stat + stat2
  
-stat3 <- stat_function(aes(x = xval, y = ..y..), fun = dunif, colour="darkgreen", n = length(z$myVar), args = list(min=min(z$myVar), max=max(z$myVar)))
+stat3 <- stat_function(aes(x = xval, y = ..y..), fun = dunif, 
+                       colour="darkgreen", n = length(bacteria$width), args = list(min=min(bacteria$width), max=max(bacteria$width)))
  p1 + stat + stat2 + stat3
  
-gammaPars <- fitdistr(z$myVar,"gamma")
+gammaPars <- fitdistr(bacteria$width,"gamma")
 shapeML <- gammaPars$estimate["shape"]
 rateML <- gammaPars$estimate["rate"]
+print(gammaPars)
 
-stat4 <- stat_function(aes(x = xval, y = ..y..), fun = dgamma, colour="brown", n = length(z$myVar), args = list(shape=shapeML, rate=rateML))
+stat4 <- stat_function(aes(x = xval, y = ..y..), fun = dgamma, colour="purple",
+                       n = length(bacteria$width), args = list(shape=shapeML, rate=rateML))
  p1 + stat + stat2 + stat3 + stat4
  
-pSpecial <- ggplot(data=z, aes(x=myVar/(max(myVar + 0.1)), y=..density..)) +
+pSpecial <- ggplot(data=bacteria, aes(x=width/(max(width + 0.1)), 
+                                      y=..density..)) +
   geom_histogram(color="grey60",fill="cornsilk",size=0.2) + 
   xlim(c(0,1)) +
   geom_density(size=0.75,linetype="dotted")
 
-betaPars <- fitdistr(x=z$myVar/max(z$myVar + 0.1),start=list(shape1=1,shape2=2),"beta")
+betaPars <- fitdistr(x=bacteria$width/max(bacteria$width + 0.1),start=list(shape1=1,shape2=2),"beta")
 shape1ML <- betaPars$estimate["shape1"]
 shape2ML <- betaPars$estimate["shape2"]
 
-statSpecial <- stat_function(aes(x = xval, y = ..y..), fun = dbeta, colour="orchid", n = length(z$myVar), args = list(shape1=shape1ML,shape2=shape2ML))
+statSpecial <- stat_function(aes(x = xval, y = ..y..), fun = dbeta,
+                             colour="orchid", n = length(bacteria$width), args = list(shape1=shape1ML,shape2=shape2ML))
 pSpecial + statSpecial
 
 ```
+
+###### Okay, so none of the probability distributions fit great
+###### which is probably because there are 2 different strains of bacteria in this dataset
+###### next time need to split apart the different strains into 2 datsets
+###### but of all the distributions, I guess the gamma fits the best
+
+###### maximum likelihood parameters for gamma distribution
+shape = 5.743
+rate = 0.277
+
+```{r, echo=TRUE}
+
+#from before
+gammaPars <- fitdistr(bacteria$width,"gamma")
+shapeML <- gammaPars$estimate["shape"]
+rateML <- gammaPars$estimate["rate"]
+print(gammaPars)
+
+z2 <- rgamma(n=35,shape = 5.743, scale = 0.277)
+z2 <- data.frame(1:35,z2)
+names(z2) <- list("ID","myVar")
+z2 <- z2[z2$myVar>0,]
+str(z2)
+summary(z2$myVar)
+
+xval2 <- seq(0,max(z2$myVar),len=length(z2$myVar))
+
+p3 <- ggplot(data=z2, aes(x=myVar, y=..density..)) +
+  geom_histogram(color="grey60",fill="cornsilk",size=0.2) 
+print(p3)
+
+gammaPars <- fitdistr(z2$myVar,"gamma")
+shapeML2 <- gammaPars$estimate["shape"]
+rateML2 <- gammaPars$estimate["rate"]
+
+stat4 <- stat_function(aes(x = xval2, y = ..y..), fun = dgamma, colour="brown", 
+              n = length(z2$myVar), args = list(shape=shapeML2, rate=rateML2))
+ p3 + stat4
+
+p2 <- ggplot(data=bacteria, aes(x=width, y=..density..)) +
+  geom_histogram(color="grey60",fill="cornsilk",size=0.2) 
+print(p2)
+
+stat5 <- stat_function(aes(x = xval2, y = ..y..), fun = dgamma, colour="purple", 
+          n = length(bacteria$width), args = list(shape=shapeML, rate=rateML))
+ p2 + stat5
+
+````
+
+###### Yes, the model is doing a good job of simulating realistic data; however the x-axis is a power of 10 smaller than the original data. These data are hard to fit a curve to, so given that, I think the simulation is as good as it can be. Perhaps if my original data fit a gamma distribution more closely, the simualtion would be even more realistic. I'm also wondering if there is a numerical measurement to see how well the data fit the distribution. 
+  
+  
