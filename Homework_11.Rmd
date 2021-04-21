@@ -1,0 +1,19 @@
+---
+title: "Homework 11"
+author: "Sarah Morris"
+date: "4/21/2021"
+output: html_document
+---
+
+```{r, echo = TRUE}
+#from Lecture 18:
+# Loop over rows and columns
+m <- matrix(round(runif(20),digits=2),nrow=5)
+for (i in 1:nrow(m)) {
+for (j in 1:ncol(m)) {
+m[i,j] <- m[i,j] + i + j
+} # end of column j loop
+} # end or row i loop
+print(m)
+```
+

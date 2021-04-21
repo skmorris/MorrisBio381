@@ -28,12 +28,12 @@ output:
 
 #### Week 8: **Nothing due**
 
-#### Week 9: [Homework 8]
+#### Week 9: [Homework 8](Homework_8.html) 
 
-#### Week 10: [Homework 9]
+#### Week 10: [Homework 9](Homework_9.html)
 
-#### Week 11: [Homework 10]
+#### Week 11: [Homework 10](Homework_10.html)
 
-#### Week 12: [Homework 11]
+#### Week 12: [Homework 11](Homework_11.html)
 
-#### Week 13: [Homework 12]
+#### Week 13: [Homework 12](Homework_12.html)
