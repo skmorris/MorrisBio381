@@ -2,8 +2,256 @@
 title: "Homework 8"
 author: "Sarah Morris"
 date: "3/31/2021"
-output: html_document
+output:
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
 ---
 
+#### Homework 8: Creating Fake Data Sets to Explore Hypotheses
+
+##### I will be using data from this publication:  
+**Li, M., Zheng, Y., Fan, R., Zhong, Q., & Cheng, D. (2017).** Scaling relationships of twig biomass allocation in Pinus hwangshanensis along an altitudinal gradient. PLOS ONE, 12(5). 
+  
+The means, variances and sample sizes for low and high elevational groups come from this meta-analysis that included the above paper:   
+**Midolo G, De Frenne P, Hölzel N, Wellstein C. 2019.** Global patterns of intraspecific leaf trait responses to elevation. Global Change Biology 25: 2485–2498.
+
+##### The **hypothesis** I am testing =  
+Within species with broad elevational ranges, individuals found at higher elevations will have denser leaves (higher mass per unit leaf area (**LMA**)). Alpine plant species tend to be smaller and more compact, so I believe that phenotypic plasticity within species will also trend the same way.
+
 ```{r}
+data <- read.csv("Pinus.csv")
+
+str(data) # checking structure and column label names
+
+# renaming columns
+data$LMA <- data$X.LMA..mg.mm2. # LMA = leaf mass per area (mg/mm^2)
+data$Alt <- data$X.Alt # Alt = elevation (m)
+
+# the LMA values are annoyingly small, so I'm converting the measurement to g/mm^2
+data$LMA <- data$LMA*1000
+data$LMA # these numbers are easier to look at
+
+
+low <- subset(data, Alt == "1200") # low elevation = 1200m
+mid <- subset(data, Alt == "1600") # mid elevation = 1600m
+high <- subset(data, Alt == "2000") # high elevation = 2000m 
+
+# expected mean LMA for low elevation = 100 g/mm^2
+# expected mean LMA for mid elevation = 150 g/mm^2
+# expected mean LMA for high elevation = 200 g/mm^2
+# standard deviation = 10
+# sample size for each group = 45
+
+# making the random data set
+nGroup <- 3 # number of treatment groups
+nName <- c("low","mid","high") # names of groups
+nSize <- c(45,45,45) # number of observations in each group
+nMean <- c(100,150,200) # expected mean of each group
+nSD <- c(10,10,10) # standard deviation of each group
+ID <- 1:(sum(nSize)) # assigning and id number for each row
+
+# putting the data into a dataframe
+resVar <- c(rnorm(n=nSize[1],mean=nMean[1],sd=nSD[1]),
+            rnorm(n=nSize[2],mean=nMean[2],sd=nSD[2]),
+            rnorm(n=nSize[3],mean=nMean[3],sd=nSD[3]))
+
+TGroup <- factor(x=rep(nName,nSize), levels=nName, ordered= is.ordered(nName)) # make a column with the nNames repeated nSize times as factor data so that order of elevational groups stays the way I want
+
+ANOVAdata <- data.frame(ID,TGroup,resVar) # putting it all together
+
+str(ANOVAdata) # checking it out
+hist(ANOVAdata$resVar[TGroup == "low"])
+hist(ANOVAdata$resVar[TGroup == "mid"]) #less normally distributed than I'd expect
+hist(ANOVAdata$resVar[TGroup == "high"])
+
 ```
+
+##### Question 4: analyze the data   
+ANOVA + boxplot
+```{r}
+ANOVAmodel <- aov(resVar~TGroup,data=ANOVAdata) # ANOVA analysis
+boop <- summary(ANOVAmodel) # put the summary into an object
+boop # take a peek
+aggregate(resVar~TGroup,data=ANOVAdata,FUN=mean) # print the means for low, mid, high
+unlist(boop) # to make it easier to extract the ones we want
+ANOVAsum <- list(Fval=unlist(boop)[7],probF=unlist(boop)[9]) # F statistic & p-value
+ANOVAsum
+```
+P-value of the ANOVA is *very* significant  
+Now, the boxplot:  
+```{r}
+library(ggplot2) # load ggplot
+
+ANOVAplot <- ggplot(data=ANOVAdata,aes(x=TGroup,y=resVar,fill=TGroup)) +
+  geom_boxplot() +
+  xlab("elevational group") +
+  ylab("leaf density")
+
+print(ANOVAplot)
+
+ggsave(filename = "ANOVA_HW8.pdf", plot = ANOVAplot, device = "pdf") #in case I want to look at this later
+```
+
+##### Question 5: running the analysis multiple times  
+copying streamlined code down below  
+```{r}
+nGroup <- 3 
+nName <- c("low","mid","high")
+nSize <- c(45,45,45) 
+nMean <- c(100,150,200)
+nSD <- c(10,10,10) 
+ID <- 1:(sum(nSize)) 
+resVar <- c(rnorm(n=nSize[1],mean=nMean[1],sd=nSD[1]),
+            rnorm(n=nSize[2],mean=nMean[2],sd=nSD[2]),
+            rnorm(n=nSize[3],mean=nMean[3],sd=nSD[3]))
+TGroup <- factor(x=rep(nName,nSize), levels=nName, ordered= is.ordered(nName)) 
+ANOVAdata <- data.frame(ID,TGroup,resVar) 
+ANOVAmodel <- aov(resVar~TGroup,data=ANOVAdata) 
+boop <- summary(ANOVAmodel) 
+aggregate(resVar~TGroup,data=ANOVAdata,FUN=mean)
+unlist(boop)
+ANOVAsum <- list(Fval=unlist(boop)[7],probF=unlist(boop)[9])
+ANOVAsum
+ANOVAplot <- ggplot(data=ANOVAdata,aes(x=TGroup,y=resVar,fill=TGroup)) +
+  geom_boxplot() +
+  xlab("elevational group") +
+  ylab("leaf density")
+print(ANOVAplot)
+```
+After running it several times, I observe that the results are not that different with each run.  
+
+##### Question 6: Adjust the means & determine the effect size (aka how small the difference can be b/n the groups to still get a p-value less than 0.05    
+```{r}
+nGroup <- 3 
+nName <- c("low","mid","high")
+nSize <- c(45,45,45) 
+nMean <- c(140,150,160)# I adjusted the difference b/n the means to be much smaller
+nSD <- c(10,10,10) 
+ID <- 1:(sum(nSize)) 
+resVar <- c(rnorm(n=nSize[1],mean=nMean[1],sd=nSD[1]),
+            rnorm(n=nSize[2],mean=nMean[2],sd=nSD[2]),
+            rnorm(n=nSize[3],mean=nMean[3],sd=nSD[3]))
+TGroup <- factor(x=rep(nName,nSize), levels=nName, ordered= is.ordered(nName)) 
+ANOVAdata <- data.frame(ID,TGroup,resVar) 
+ANOVAmodel <- aov(resVar~TGroup,data=ANOVAdata) 
+boop <- summary(ANOVAmodel) 
+aggregate(resVar~TGroup,data=ANOVAdata,FUN=mean)
+unlist(boop)
+ANOVAsum <- list(Fval=unlist(boop)[7],probF=unlist(boop)[9])
+ANOVAsum
+ANOVAplot <- ggplot(data=ANOVAdata,aes(x=TGroup,y=resVar,fill=TGroup)) +
+  geom_boxplot() +
+  xlab("elevational group") +
+  ylab("leaf density")
+print(ANOVAplot)
+# that one was still very significantly different, so I'll try again
+
+nGroup <- 3 
+nName <- c("low","mid","high")
+nSize <- c(45,45,45) 
+nMean <- c(145,150,155)# going even smaller this time
+nSD <- c(10,10,10) 
+ID <- 1:(sum(nSize)) 
+resVar <- c(rnorm(n=nSize[1],mean=nMean[1],sd=nSD[1]),
+            rnorm(n=nSize[2],mean=nMean[2],sd=nSD[2]),
+            rnorm(n=nSize[3],mean=nMean[3],sd=nSD[3]))
+TGroup <- factor(x=rep(nName,nSize), levels=nName, ordered= is.ordered(nName)) 
+ANOVAdata <- data.frame(ID,TGroup,resVar) 
+ANOVAmodel <- aov(resVar~TGroup,data=ANOVAdata) 
+boop <- summary(ANOVAmodel) 
+aggregate(resVar~TGroup,data=ANOVAdata,FUN=mean)
+unlist(boop)
+ANOVAsum <- list(Fval=unlist(boop)[7],probF=unlist(boop)[9])
+ANOVAsum
+ANOVAplot <- ggplot(data=ANOVAdata,aes(x=TGroup,y=resVar,fill=TGroup)) +
+  geom_boxplot() +
+  xlab("elevational group") +
+  ylab("leaf density")
+print(ANOVAplot)
+#still significant
+
+nGroup <- 3 
+nName <- c("low","mid","high")
+nSize <- c(45,45,45) 
+nMean <- c(149,150,151)# smaller!
+nSD <- c(10,10,10) 
+ID <- 1:(sum(nSize)) 
+resVar <- c(rnorm(n=nSize[1],mean=nMean[1],sd=nSD[1]),
+            rnorm(n=nSize[2],mean=nMean[2],sd=nSD[2]),
+            rnorm(n=nSize[3],mean=nMean[3],sd=nSD[3]))
+TGroup <- factor(x=rep(nName,nSize), levels=nName, ordered= is.ordered(nName)) 
+ANOVAdata <- data.frame(ID,TGroup,resVar) 
+ANOVAmodel <- aov(resVar~TGroup,data=ANOVAdata) 
+boop <- summary(ANOVAmodel) 
+aggregate(resVar~TGroup,data=ANOVAdata,FUN=mean)
+unlist(boop)
+ANOVAsum <- list(Fval=unlist(boop)[7],probF=unlist(boop)[9])
+ANOVAsum
+ANOVAplot <- ggplot(data=ANOVAdata,aes(x=TGroup,y=resVar,fill=TGroup)) +
+  geom_boxplot() +
+  xlab("elevational group") +
+  ylab("leaf density")
+print(ANOVAplot)
+# this one wasn't significantly different
+# so having a difference of 5 g/mm^2 b/n groups was significant, but 1 g/mm^2 is not
+# let's try 3 now
+
+nGroup <- 3 
+nName <- c("low","mid","high")
+nSize <- c(45,45,45) 
+nMean <- c(147,150,153)# smaller!
+nSD <- c(10,10,10) 
+ID <- 1:(sum(nSize)) 
+resVar <- c(rnorm(n=nSize[1],mean=nMean[1],sd=nSD[1]),
+            rnorm(n=nSize[2],mean=nMean[2],sd=nSD[2]),
+            rnorm(n=nSize[3],mean=nMean[3],sd=nSD[3]))
+TGroup <- factor(x=rep(nName,nSize), levels=nName, ordered= is.ordered(nName)) 
+ANOVAdata <- data.frame(ID,TGroup,resVar) 
+ANOVAmodel <- aov(resVar~TGroup,data=ANOVAdata) 
+boop <- summary(ANOVAmodel) 
+aggregate(resVar~TGroup,data=ANOVAdata,FUN=mean)
+unlist(boop)
+ANOVAsum <- list(Fval=unlist(boop)[7],probF=unlist(boop)[9])
+ANOVAsum
+ANOVAplot <- ggplot(data=ANOVAdata,aes(x=TGroup,y=resVar,fill=TGroup)) +
+  geom_boxplot() +
+  xlab("elevational group") +
+  ylab("leaf density")
+print(ANOVAplot)
+#this one was not significant! p = 0.054
+```
+The effect size is approximately 4 g/mm^2. When there is a difference of 4 g/mm^2 b/n the means, the results are usually statistically significant (p<0.05), but when the difference is 3, they're usually not significant.  
+
+
+##### Question 7: For the effect sizes I hypothesized (50 g/mm^2 b/n groups), what is the minimum sample size needed to detect a statistically significant effect?  
+```{r}
+nGroup <- 3 
+nName <- c("low","mid","high")
+nSize <- c(2,2,2) 
+nMean <- c(100,150,200)
+nSD <- c(10,10,10) 
+ID <- 1:(sum(nSize)) 
+resVar <- c(rnorm(n=nSize[1],mean=nMean[1],sd=nSD[1]),
+            rnorm(n=nSize[2],mean=nMean[2],sd=nSD[2]),
+            rnorm(n=nSize[3],mean=nMean[3],sd=nSD[3]))
+TGroup <- factor(x=rep(nName,nSize), levels=nName, ordered= is.ordered(nName)) 
+ANOVAdata <- data.frame(ID,TGroup,resVar) 
+ANOVAmodel <- aov(resVar~TGroup,data=ANOVAdata) 
+boop <- summary(ANOVAmodel) 
+aggregate(resVar~TGroup,data=ANOVAdata,FUN=mean)
+unlist(boop)
+ANOVAsum <- list(Fval=unlist(boop)[7],probF=unlist(boop)[9])
+ANOVAsum
+ANOVAplot <- ggplot(data=ANOVAdata,aes(x=TGroup,y=resVar,fill=TGroup)) +
+  geom_boxplot() +
+  xlab("elevational group") +
+  ylab("leaf density")
+print(ANOVAplot)
+```
+It seems that given the standard deviation, with any reasonable sample size (greater than 1), my expected means lead to significant results.  
+Perhaps my hypothesized effect size is too large?
+
+
+
+

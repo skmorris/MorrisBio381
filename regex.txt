@@ -1,0 +1,35 @@
+. is any character or space
+\. a "period" in a standard search
+
+Wildcards
+\w a single word character [letter, number, or _]
+\d a single number character [0 - 9]
+\t a single tab space
+\s a single space, tab or line break
+\n a single line break (try \r)
+
+Quantifiers - add to any of the Wildcards
+\w+ one or more consecutive word characters
+\w* zero or more consecutive word characters
+\w{3} exactly 3 consecutive word characters
+\{3,} 3 or more consecutive word characters
+\{3,5} exactly 3, 4 or 5 consecutive word characters
+
+.* "all the rest"
+
+use () to capture pieces of text
+use \1 in replacement statement for first capture; \2 for second etc. 
+
+Custom character sets
+[ATCG] # a single character that is A, T, C or G
+[ATCG]+ # DNA sequence
+
+Negated character sets
+[^XY] # a single character that is anything but X or Y
+[^0-9.]+ # one or more characters that are not integers or decimal numbers
+
+Boundary stakes
+^ # outside of a character set to indicate the start of a line 
+$ # end of line
+`\<` # start of a word
+`\>` # end of a word (but not in BBedit)
