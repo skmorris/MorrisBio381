@@ -16,38 +16,213 @@ output:
 ##########################################################
 # FUNCTIONS
 ##########################################################
-# FUNCTION: FunctionName
-# one line description
-# input: x
-# output: x
+# FUNCTION: MakeData
+# read in the data
+# input: size, mean & variance of groups
+# output: data frame called mydata
 #----------------------------------------------------------
-FunctionName <- function() {
+MakeData <- function(nSize=N, nMean=Avg, nSD=Var) {
+  nName <- c("low","mid","high")
+  ID <- 1:(sum(nSize))
   
+  y_Var <- c(rnorm(n=nSize[1],mean=nMean[1],sd=nSD),
+              rnorm(n=nSize[2],mean=nMean[2],sd=nSD),
+              rnorm(n=nSize[3],mean=nMean[3],sd=nSD))
   
-  return("testing.....FunctionName")
+  x_Var <- factor(x=rep(nName,nSize), levels=nName, ordered= is.ordered(nName)) 
+  
+  mydata <- data.frame(ID,x_Var,y_Var) 
+  
+  return(mydata)
+  
 }
-#----------------------------------------------------------
 
+#----------------------------------------------------------
+# FUNCTION: AnalyzeData
+# run ANOVA
+# input: dataframe of categorical vector and continuous response vector
+# output: means of groups, F-stat, p-value
+#----------------------------------------------------------
+AnalyzeData <- function(x_Var=rep(LETTERS[1:2],each=5),y_Var=runif(10)) {
+  data=as.data.frame(x_Var,y_Var)
+  ANOVAmodel <- aov(y_Var~x_Var,data) # ANOVA analysis
+boop <- summary(ANOVAmodel) # put the summary into an object
+
+unlist(boop) # to make it easier to extract the ones we want
+ANOVAsum <- list(Fval=unlist(boop)[7],probF=unlist(boop)[9], 
+                 Group_Means=aggregate(y_Var~x_Var,data=data,FUN=mean))
+
+return(ANOVAsum) 
+
+}
+
+#----------------------------------------------------------
+# FUNCTION: BoxPlotter
+# plots data
+# input: categorical vector and continuous response vector
+# output: boxplot
+#----------------------------------------------------------
+BoxPlotter <- function(x_Var=rep(LETTERS[1:2],each=5),y_Var=runif(10)) {
+  df=as.data.frame(x_Var,y_Var)
+  
+  ANOVAplot <- ggplot2::ggplot(data=df,aes(x=x_Var,y=y_Var,fill=x_Var)) +
+  geom_boxplot() +
+  xlab("predictor variable") +
+  ylab("response variable")
+
+return(ANOVAplot)
+  
+}
+
+#----------------------------------------------------------
 ###########################################################
 # END FUNCTIONS
 ###########################################################
+
 # Preliminaries
 library(ggplot2)
-set.seed(99) # makes the code reproducible with the same results
+# set.seed(99) # makes the code reproducible with the same results
 #-----------------------------------------------------------
+
 # Global variables
-blahFile <- "blah.csv"
-xCol <- 7
-yCol <- 5
+
+N <- c(45,45,45) 
+Avg <- c(100,150,200) 
+Var <- 10
+
 #------------------------------------------------------------
+
 # Program body
+temp1 <- MakeData() # construct the data frame
 
-# ----------------------------------------------------------
+x <- temp1$x_Var # extract the categorical vector
+y <- temp1$y_Var # extract the response vector
+df <- temp1$mydata # make the df an object
 
+temp2 <- AnalyzeData(x_Var=x, y_Var=y) # fit the model
 
+BoxPlotter(x_Var=x, y_Var=y) # create graph
+
+print(temp2)# show the means of each group, F stat & p-value
+
+if (temp2$probF < 0.05){
+  print("Means of groups significantly different")
+} else {
+  print("Means of groups NOT significantly different")
+}
+
+# -----------------------------------------------------------
 ```
-Modifying the program to do something else w/o editing the functions:   
+  
+Modifying the program to do something else: since my categorical variables in the above ANOVA are measurements of elevation, I technically have 2 numeric variables. So, I will try a regression model with the data just for fun.  
 
 ```{r}
 
+##########################################################
+# FUNCTIONS
+##########################################################
+# FUNCTION: MakeData2
+# read in the data
+# input: size, mean & variance of groups
+# output: data frame called mydata
+#----------------------------------------------------------
+MakeData2 <- function(nSize=N, nMean=Avg, nSD=Var) {
+  nName <- c(1200,1600,2000)# different elevations of data
+  ID <- 1:(sum(nSize))
+  
+  y_Var <- c(rnorm(n=nSize[1],mean=nMean[1],sd=nSD),
+              rnorm(n=nSize[2],mean=nMean[2],sd=nSD),
+              rnorm(n=nSize[3],mean=nMean[3],sd=nSD))
+  
+  x_Var <- rep(nName,nSize)
+  
+  mydata <- data.frame(ID,x_Var,y_Var) 
+  
+  return(mydata)
+  
+}
+
+#----------------------------------------------------------
+# FUNCTION: AnalyzeData2
+# fits an ordinary least squares regression model
+# input: dataframe of 2 continuous vectors
+# output: model summary from lm
+#----------------------------------------------------------
+AnalyzeData2 <- function(x_Var=runif(135),y_Var=runif(135)) {
+  data=as.data.frame(x_Var,y_Var)
+  lm_model <- lm(y_Var~x_Var,data=data) # lm analysis
+return(summary(lm_model)) # put the summary into an object
+}
+
+#----------------------------------------------------------
+# FUNCTION: Sum_lm
+# pull elements from summary of linear model
+# input: list from summary call of lm
+# output: vector of regression residuals
+#----------------------------------------------------------
+Sum_lm <- function(z=NULL) {
+  if(is.null(z)){
+    z <- summary(lm(runif(135)~runif(135)))
+  }
+  return(z$residuals)
+}
+
+#----------------------------------------------------------
+# FUNCTION: LMPlotter
+# plots data
+# input: predictor vector and continuous response vector
+# output: linear model
+#----------------------------------------------------------
+LMPlotter <- function(x_Var = runif(135), y_Var = runif(135))  {
+  
+  df = cbind.data.frame(x_Var,y_Var)
+  
+   LMplot <- ggplot(data = df)+ 
+     aes(x=x_Var,y=y_Var)+ 
+     geom_point()+ 
+     stat_smooth(method="lm")+ 
+     xlab("predictor variable") + 
+     ylab("response variable")
+ 
+   print(LMplot)
+
+}
+
+# for some reason, the plot isn't returning - although when I copy/paste this code
+# to a normal r script, it runs without problems...
+# not sure how to fix this
+
+#----------------------------------------------------------
+###########################################################
+# END FUNCTIONS
+###########################################################
+
+# Preliminaries
+library(ggplot2)
+# set.seed(99) # makes the code reproducible with the same results
+#-----------------------------------------------------------
+
+# Global variables
+
+N <- c(45,45,45) 
+Avg <- c(100,150,200) 
+Var <- 10
+
+#------------------------------------------------------------
+
+# Program body
+temp1 <- MakeData2() # construct the data frame
+
+x <- temp1$x_Var # extract the predictor vector
+y <- temp1$y_Var # extract the response vector
+
+temp2 <- AnalyzeData2(x_Var=x, y_Var=y) # fit the model
+temp3 <- Sum_lm(temp2) # extract residuals
+
+LMPlotter(x_Var=x, y_Var=y) # create graph
+
+print(temp2)# show the model summary
+print(temp3)# show the residuals
+
+# -----------------------------------------------------------
 ```
