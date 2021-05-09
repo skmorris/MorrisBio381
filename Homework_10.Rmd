@@ -2,9 +2,268 @@
 title: "Homework 10"
 author: "Sarah Morris"
 date: "4/14/2021"
-output: html_document
+output:
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
 ---
+#### Question 1: Using a for loop, write a function to calculate the number of zeroes in numeric vector. Before entering the loop set up a counter variable & inside the loop, add 1 to the counter each time you have a zero in the matrix. 
 
 ```{r}
+# ------------------------------------------------------
+# FUNCTION Counting_Zeros
+# description: counts the number of zeros in a vector
+# inputs: numeric vector
+# outputs: count of zeros
+########################################################
+Counting_Zeros <- function(x = 0:50) {
+  counter <- 0
+  
+  for(i in seq_along(x)){
+    if(x[i] == 0){
+      counter <- counter + 1
+    }
+  }
+  return(counter)
+  
+} # end of Counting_Zeros
+# ------------------------------------------------------
+Counting_Zeros()
+# it works
+# testing with another vector input
+vector <- rep(-1:1,50)
+Counting_Zeros(vector)
+# still works
 ```
 
+#### Question 2: write function using subseting into a single line of code
+
+```{r}
+# using same vector created for question 1
+length(which(vector == 0))
+# yea this is far simpler than the function
+
+```
+
+#### Question 3: write a function that takes 2 integers that represent the rows & columns in a matrix & outputs a new matrix that is the product of the row number and the column number
+
+```{r}
+# ------------------------------------------------------
+# FUNCTION matrix_multiplyer
+# description: creates a matrix and fills it w/ row # * col #
+# inputs: number of rows & number of columns
+# outputs: matrix
+########################################################
+matrix_multiplyer <- function(x=5, y=6) {
+  
+  mymatrix <- matrix(data=0, nrow=x, ncol=y)
+  for(i in 1:x){
+    for(j in 1:y){
+      mymatrix[i,j] = i*j
+    }
+  }
+  
+  return(mymatrix)
+  
+} # end of matrix_multiplyer
+# ------------------------------------------------------
+matrix_multiplyer()
+
+```
+
+#### Question 4: conduct a randomization test for some of my own data  
+modify:  
+- read in data function  
+- calculate the metric function  
+- randomize the data function  
+```{r}
+library(ggplot2)
+library(TeachingDemos)
+
+char2seed("chocolate withdrawal") 
+
+# ------------------------------------------------------
+# FUNCTION read_data
+# description: read in (or generate) data set for analysis  
+# inputs: file name (or nothing)
+# outputs: 3 column dataframe of observed data (ID,x,y)
+########################################################
+read_data <- function(z=NULL) {
+  if(is.null(z)){
+    x_obs <- 1:20
+    y_obs <- x_obs + 10*rnorm(20)
+    df <- data.frame(ID=seq_along(x_obs),x_obs, y_obs)
+    } else
+  
+  df <- read.csv(file=z, header=TRUE, stringsAsFactors = FALSE, sep=",")
+  return(df)
+  
+} # end of read_data
+# ------------------------------------------------------
+
+# ------------------------------------------------------
+# FUNCTION get_metric
+# description: calculate metric for randomization test
+# inputs: 2 column dataframe for regression
+# outputs: regression slope
+########################################################
+get_metric <- function(z=NULL) {
+  if(is.null(z)){
+    x_obs <- 1:20
+    y_obs <- x_obs + 10*rnorm(20)
+    z <- data.frame(x_obs, y_obs)}
+  
+  . <- lm(z[,2]~z[,1])
+  . <- summary(.)
+  . <- .$coefficients[2,1]
+  
+  slope <- .
+  return(slope)
+  
+} # end of get_metric
+# ------------------------------------------------------
+
+# ------------------------------------------------------
+# FUNCTION shuffle_data
+# description: randomize data for regression analysis
+# inputs: 3-column data frame (ID,xVar,yVar)
+# outputs: 3-column data frame (ID,xVar,yVar)
+########################################################
+shuffle_data <- function(z=NULL) {
+  if(is.null(z)){
+    x_obs <- 1:20
+    y_obs <- x_obs + 10*rnorm(20)
+    z <- data.frame(x_obs, y_obs)}
+  
+  z[,2] <- sample(z[,2]) # reshuffle density column
+  
+  return(z)
+  
+} # end of shuffle_data
+# ------------------------------------------------------
+
+# ------------------------------------------------------
+# FUNCTION get_pval
+# description: calculate p value from simulation
+# inputs: list of observed metric, and vector of simulated metrics
+# outputs: lower, upper tail probability values
+########################################################
+get_pval <- function(z=NULL) {
+  if(is.null(z)){
+    z <- list(rnorm(1),rnorm(1000)) }
+  p_lower <- mean(z[[2]]<=z[[1]]) 
+  # what proportion of 1000 cases in which simulated value is less than the observed value (lower tail probability)
+  p_upper <- mean(z[[2]]>=z[[1]]) # double bracket pulls out item from list
+  # what proportion of 1000 simulated slopes are greater than the observed slope 
+  # z[1] = observed slope & z[2] = 1000 simulated slopes
+  return(c(pL=p_lower,pU=p_upper)) # these have to sum to 1
+  # we have values above and below; area under curve = 1
+} # end of get_pval
+# ------------------------------------------------------
+
+# ------------------------------------------------------
+# FUNCTION plot_ran_test
+# description: create ggplot of histogram of simulated values
+# inputs: list of observed metric and vector of simulated metrics
+# outputs: saved ggplot graph
+########################################################
+plot_ran_test <- function(z=NULL) {
+  if(is.null(z)){
+    z <- list (rnorm(1), rnorm(1000))}
+  
+  df <- data.frame(ID=seq_along(z[[2]]),sim_x=z[[2]])
+  p1 <- ggplot(data=df, mapping=aes(x=sim_x))
+  p1 + geom_histogram(mapping=aes(fill=I("goldenrod"), color=I("black")))+
+    geom_vline(aes(xintercept=z[[1]],col="blue")) # vertical line for obs slope
+  # tail probabilities are the left and right of the line
+  # histogram is the distribution of 1000 simulated slopes
+  
+} # end of plot_ran_test
+# ------------------------------------------------------
+
+########################################################################
+#### PUTTING IT ALL TOGETHER ###########################################
+########################################################################
+
+# Preliminaries
+n_sim <- 1000 # number of simulated data sets
+x_sim <- rep(NA, n_sim) # set up empty vector for simulated slopes
+
+
+df <- read_data(z="leaf_data.csv") # read in the data
+x_obs <- get_metric(df) # get slope of observed data
+
+for (i in seq_len(n_sim)) {
+  x_sim[i] <- get_metric(shuffle_data(df)) # run simulation
+}
+
+slopes <- list(x_obs,x_sim) 
+get_pval(slopes) 
+# pL = 0.002
+# pU = 0.998
+# observed slope is smaller than most of the simulated
+
+plot_ran_test(slopes)
+# blue line splits distribution into upper and lower tail
+# observed slope is unusually small compared to simulated distribution
+
+
+```
+
+
+#### Question 5: calculate statistical analyses for my data and compare to randomization test 
+```{r}
+library(ggplot2)
+
+mydata <- read.csv("leaf_data.csv")
+str(mydata) # 135 observations of 2 variables 
+
+ . <- lm(mydata[,2] ~ mydata[,1]) # leaf density ~ elevation
+  . <- summary(.) # linear model summary
+  . <- .$coefficients[2,1] # pull out slope
+  slope <- . # rename it
+  print(slope) # print slope (aka my observed metric)
+  
+  LMplot <- ggplot(data = mydata)+ 
+     aes(x=elevation,y=density)+ 
+     geom_point()+ 
+     stat_smooth(method="lm")+ 
+     xlab("Elevation (m)") + 
+     ylab("leaf density (g/mm^2)")
+   print(LMplot)
+
+```
+
+**slope of observed data = -0.011**  
+
+There is a big difference in the estimated/randomized p-value and the observed, so I will run the program again with another starting seed.
+
+```{r}
+# libraries already loaded
+# functions already in the program
+
+char2seed("my dog's name is Teeny") 
+n_sim <- 10000 
+x_sim <- rep(NA, n_sim) 
+
+
+df <- read_data(z="leaf_data.csv") 
+x_obs <- get_metric(df) 
+
+for (i in seq_len(n_sim)) {
+  x_sim[i] <- get_metric(shuffle_data(df)) 
+}
+
+slopes <- list(x_obs,x_sim) 
+get_pval(slopes) 
+# pL = 0.0025
+# pU = 0.9975
+# observed slope is still smaller than most of the simulated
+
+plot_ran_test(slopes)
+# observed slope is still unusually small compared to simulated distribution
+```
+
+There are persistent differences in the observed and randomized p-values (regardless of the starting seed or number of replications).  
+
+I believe this is because there *is* an actual correlation in the observed data that isn't due to random chance. If a mere shuffling of the data produced the same results as the observed, that would lead me to believe that my results were a result of random chance and not actually due to the biology of the system.
