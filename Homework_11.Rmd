@@ -2,18 +2,181 @@
 title: "Homework 11"
 author: "Sarah Morris"
 date: "4/21/2021"
-output: html_document
+output:
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
 ---
 
-```{r, echo = TRUE}
-#from Lecture 18:
-# Loop over rows and columns
-m <- matrix(round(runif(20),digits=2),nrow=5)
-for (i in 1:nrow(m)) {
-for (j in 1:ncol(m)) {
-m[i,j] <- m[i,j] + i + j
-} # end of column j loop
-} # end or row i loop
-print(m)
-```
+#### Batch Processing
 
+```{r}
+# using real data to simulate multiple files of data for batch processing
+sporedata <- read.csv("spore_size.csv")
+
+sporedata[] <- lapply(sporedata, as.numeric)
+
+clean_spores <- sporedata[complete.cases(sporedata),] # subset non-NA data/clean cases
+
+length_avg <- mean(clean_spores$Length)
+width_avg <- mean(clean_spores$Width)
+vol_avg <- mean(clean_spores$Volume)
+
+lengthSD <- sd(clean_spores$Length)
+widthSD <- sd(clean_spores$Width)
+volSD <- sd(clean_spores$Volume)
+
+# V <- V[sign(V) == 1] # to eliminate negative values
+
+####################################################################
+# ------------------------------------------------------
+# FUNCTION file_builder
+# description: creates a set of random files for regression
+# inputs: file_n = number of files to create 
+#         file_folder = name of folder for random files
+#         file_size = c(min,max) number of rows in file
+# outputs: creates a set of random files
+########################################################
+file_builder <- function(file_n=10,
+                         file_folder="SporeFiles/", 
+                         file_size=c(15,100)) 
+                          { 
+  for (i in seq_len(file_n)) { 
+    file_length <- sample(file_size[1]:file_size[2], size=1) 
+    spore_length <- rnorm(n=file_length, mean=length_avg, sd=lengthSD) 
+    spore_width <- rnorm(n=file_length, mean=width_avg, sd=widthSD) 
+    . <- rnorm(n=file_length, mean=vol_avg, sd=volSD) 
+    spore_vol <- replace(., which(. < 0), NA) # replace negative values with NAs
+    df <- data.frame(spore_length,spore_width,spore_vol) 
+    
+# create label for file name with padded zeros
+    file_label <- paste(file_folder, 
+                        "Spore",
+                        formatC(i, # takes formatting from C language
+                                width=3, 
+                                format="d",
+                                flag="0"),
+                        ".csv",sep="")
+# set up data file and incorporate time stampe and minimal metadata
+    write.table(cat("# Simulated spore data file for batch processing", "\n",
+                    "# timestamp: ",as.character(Sys.time()), 
+                    "\n", "# SKM", "\n",
+                    "# ----------------------------------", "\n",
+                    "\n",
+                    file=file_label, 
+                    row.names="",
+                    col.names="",
+                    sep=""))
+    
+# now add the data frame
+    write.table(x=df, 
+                file=file_label, 
+                sep=",", 
+                row.names=FALSE, 
+                append=TRUE) 
+  } # end of for loop
+    
+} # end of file_builder
+# ------------------------------------------------------
+
+# ------------------------------------------------------
+# FUNCTION reg_stats
+# description: fits linear model, extract stats
+# inputs: 3 column dataframe   
+# outputs: slope,p-value, and r^2 
+########################################################
+reg_stats <- function(d=NULL) {
+             if(is.null(d)) {
+               len <- runif(10)
+               wid <- runif(10) # going to ignore this for simplicity
+               vol <- runif(10)
+               d <- data.frame(len,wid,vol)
+             }
+  . <- lm(data=d,d[,3]~d[,1])
+  . <- summary(.)
+  VxL_stats_list <- list(Slope=.$coefficients[2,1],
+                     pVal=.$coefficients[2,4],
+                     r2=.$r.squared)
+  . <- lm(data=d,d[,3]~d[,2])
+  . <- summary(.)
+  VxW_stats_list <- list(Slope=.$coefficients[2,1],
+                     pVal=.$coefficients[2,4],
+                     r2=.$r.squared)
+  
+  
+  return(c(VxL_stats_list,VxW_stats_list))
+  
+} # end of reg_stats
+# ------------------------------------------------------
+
+library(TeachingDemos)
+char2seed("Flatpicking solo")
+
+########################################################
+# Global Variables
+file_folder <- "SporeFiles/"
+n_files <- 50
+file_out <- "Spore_Stats.csv"
+########################################################
+
+# create data sets
+dir.create(file_folder)
+file_builder(file_n=n_files) #col names warning is ok to ignore
+file_names <- list.files(path=file_folder)
+
+# create a data frame to hold summary file statistics
+ID <- seq_along(file_names)
+file_name <- file_names
+VxL_slope <- rep(NA, length(file_names))
+VxL_pVal <- rep(NA, length(file_names))  
+VxL_r2 <- rep(NA, length(file_names))  
+VxW_slope <- rep(NA, length(file_names))
+VxW_pVal <- rep(NA, length(file_names))  
+VxW_r2 <- rep(NA, length(file_names))  
+
+stats_out <- data.frame(ID,file_name,VxL_slope,VxL_pVal,VxL_r2,
+                        VxW_slope,VxW_pVal,VxW_r2)
+
+# batch process by looping by looping through individual files
+
+for (i in seq_along(file_names)) { # to get current # of files in the data set
+     data <- read.table(file=paste(file_folder,file_names[i],sep=""),
+                        sep=",",
+                        header=TRUE)
+     d_clean <- data[complete.cases(data),] # subset non-NA data/clean cases
+     
+     . <- reg_stats(d_clean) # pull out regression stats from clean file
+     
+     stats_out[i,3:8] <- unlist(.) 
+}
+
+# set up output file and incorporate time stamp and minimal metadata
+
+# write.table(cat("# Summary stats for ", 
+#                 "batch processing of regression models",
+#                 "\n",
+#                 "# timestamp: ", as.character(Sys.time()),
+#                 "\n",
+#                 file=file_out,
+#                 row.names="",
+#                 col.names="",
+#                 sep=""))
+
+# now add the data frame
+write.table(x=stats_out,
+            file=file_out,
+            row.names=FALSE,
+            col.names=TRUE,
+            sep=",",
+            append=TRUE) # don't worry about warning message re appending col names
+
+```
+Yay! It worked. I created 50 files in Spore files with spore width, length and volume measurements, and I created a summary .csv with the calculates slopes, p-values and r squared values from the linear regression models of 1) length and volume and 2) width and volume.  
+
+
+Just for kicks, I'm going to calculate the average summary stats
+```{r}
+data <- read.csv("Spore_Stats.csv")
+print(sapply(data[3:8],mean))
+```
+Looks like the relationship isn't all that strong between length and volume or width and volume...  

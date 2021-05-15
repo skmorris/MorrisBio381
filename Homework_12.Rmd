@@ -2,7 +2,10 @@
 title: "Homework 12"
 author: "Sarah Morris"
 date: "4/28/2021"
-output: html_document
+output:
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
 ---
 
 ```{r}
