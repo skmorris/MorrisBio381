@@ -23,6 +23,8 @@ length_avg <- mean(clean_spores$Length)
 width_avg <- mean(clean_spores$Width)
 vol_avg <- mean(clean_spores$Volume)
 
+print(c(length_avg,width_avg,vol_avg))
+
 lengthSD <- sd(clean_spores$Length)
 widthSD <- sd(clean_spores$Width)
 volSD <- sd(clean_spores$Volume)
