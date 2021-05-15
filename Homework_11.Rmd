@@ -10,7 +10,8 @@ output:
 
 #### Batch Processing
 
-```{r}
+```{r setup, warning=FALSE} 
+
 # using real data to simulate multiple files of data for batch processing
 sporedata <- read.csv("spore_size.csv")
 
@@ -150,25 +151,14 @@ for (i in seq_along(file_names)) { # to get current # of files in the data set
      stats_out[i,3:8] <- unlist(.) 
 }
 
-# set up output file and incorporate time stamp and minimal metadata
-
-# write.table(cat("# Summary stats for ", 
-#                 "batch processing of regression models",
-#                 "\n",
-#                 "# timestamp: ", as.character(Sys.time()),
-#                 "\n",
-#                 file=file_out,
-#                 row.names="",
-#                 col.names="",
-#                 sep=""))
-
 # now add the data frame
 write.table(x=stats_out,
             file=file_out,
             row.names=FALSE,
             col.names=TRUE,
-            sep=",",
-            append=TRUE) # don't worry about warning message re appending col names
+            sep=",") 
+
+print(stats_out)
 
 ```
 Yay! It worked. I created 50 files in Spore files with spore width, length and volume measurements, and I created a summary .csv with the calculates slopes, p-values and r squared values from the linear regression models of 1) length and volume and 2) width and volume.  
@@ -177,6 +167,7 @@ Yay! It worked. I created 50 files in Spore files with spore width, length and v
 Just for kicks, I'm going to calculate the average summary stats
 ```{r}
 data <- read.csv("Spore_Stats.csv")
-print(sapply(data[3:8],mean))
+data1 <- data[3:8]
+print(sapply(data1,mean))
 ```
 Looks like the relationship isn't all that strong between length and volume or width and volume...  
